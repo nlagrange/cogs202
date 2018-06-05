@@ -1,3 +1,4 @@
+function wins = simData(rat_bias, noise)
 %% Initialize variables
 
 % Choose starting reward probabilites fore each state
@@ -11,19 +12,24 @@ start_state = 1;
 
 % Choose value to decrement by if reward is given
 decValue = .05;
+% decValue = 0.95;
 
 % choose number of trials
 ntrials = 100;
-%% Simulate Data
-% Make a vector of the probabilites.
-probs = [port1start, port2start, port3start];
-noise = .001;
-rat_bias = .007;
+
+% add noise
+% noise = .001;
+% rat_bias = .007;
 losses = 0;
 wins = 0;
 early_switch = 0;
+
+%% Simulate Data
+% Make a vector of the probabilites.
+probs = [port1start, port2start, port3start];
+
 % create cell array to store data
-data = {'trial', 'port', 'prob', 'reward'};
+dataCell = {'trial', 'port', 'prob', 'reward'};
 
 % Enter that state (port location).
 current_state = start_state;
@@ -34,6 +40,7 @@ for i = 1:ntrials
 current_prob = probs(current_state);
 % produce a reward or non-reward
 current_reward = rewardGen(current_prob);
+% current_reward = binornd(1,current_prob); % Equivalent
 
 % % insert values into a structure. (used cell array instead see below).
 % data.i = i;
@@ -42,14 +49,15 @@ current_reward = rewardGen(current_prob);
 % data.i.reward = current_reward;
 
 % instert values into cell array
-data{i+1,1} = i; 
-data{i+1,2} = current_state; 
-data{i+1,3} = current_prob;
-data{i+1,4} = current_reward;
+dataCell{i+1,1} = i; 
+dataCell{i+1,2} = current_state; 
+dataCell{i+1,3} = current_prob;
+dataCell{i+1,4} = current_reward;
 
 % update probabilites
 if current_reward == 1
-    probs(current_state) = probs(current_state)-.05;
+    probs(current_state) = probs(current_state)-decValue;
+%     probs(current_state) = probs(current_state)*decValue;
     losses = 0;
     wins = wins+1;
 else
@@ -80,22 +88,9 @@ else
 end
 end
 
-%% Plot Data
-% Plot skele?
-% x-axis: trial
-% y-axis: probability of reward
-% color of point: port (R=1,B=2,G=3)
-% shape of point: reward given (x=0,o=1)
-% trying to use https://www.mathworks.com/help/stats/gscatter.html
-% maybe
-% then fit some model (linear/m=x/etc)?
-X = cell2mat(data(2:end,1:1));
-Y = cell2mat(data(2:end,3:3));
-P = cell2mat(data(2:end,2:2));
-R = cell2mat(data(2:end,4:4));
-gscatter(X, Y, P, 'rgb')
-xlabel('trials');
-ylabel('p');
+% convert data to matrix form
+dataMat = cell2mat(dataCell(2:end,:));
 
-% 2nd plot?
-% curves of port probabilities with rat choice points?
+
+% plot data
+% visFunct(dataMat)
