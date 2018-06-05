@@ -14,17 +14,14 @@ decValue = .05;
 
 % choose number of trials
 ntrials = 100;
-
-% variables to impliment noise
-noise = 0;
-rat_bias = 10;
-losses = 0;
-
 %% Simulate Data
-
 % Make a vector of the probabilites.
 probs = [port1start, port2start, port3start];
-
+noise = .001;
+rat_bias = .007;
+losses = 0;
+wins = 0;
+early_switch = 0;
 % create cell array to store data
 data = {'trial', 'port', 'prob', 'reward'};
 
@@ -35,7 +32,6 @@ for i = 1:ntrials
 
 % find probability of current state
 current_prob = probs(current_state);
-
 % produce a reward or non-reward
 current_reward = rewardGen(current_prob);
 
@@ -54,18 +50,33 @@ data{i+1,4} = current_reward;
 % update probabilites
 if current_reward == 1
     probs(current_state) = probs(current_state)-.05;
+    losses = 0;
+    wins = wins+1;
 else
-    continue
+    losses = losses+1;
+    wins = 0;
+    %continue
 end
 
 % check which state has highest probabilities
-
-[~, I] = max(probs);
-
+% [~, I] = max(probs);
 % move to state with highest probability
-current_state = I;
+% current_state = I;
 
+% check which state has highest probabilities
+% get the top two, in case rat wants to switch (noise/bias)
+[M,I] = maxk(probs,3);
+
+% move to state with highest probability WITH NOISE AND BIAS
+% separating them into variables for debug purposes, will clean up later
+high_val = M(1);
+two_val = M(2);
+loss = (rat_bias + noise) * losses;
+win = (rat_bias + noise) * wins;
+if high_val - loss + win < two_val
+    current_state = I(2);
+else
+    current_state = I(1);
 end
-
-
+end
 
