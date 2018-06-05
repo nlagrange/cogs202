@@ -86,10 +86,16 @@ end
 % y-axis: probability of reward
 % color of point: port (R=1,B=2,G=3)
 % shape of point: reward given (x=0,o=1)
-% trying to use https://www.mathworks.com/help/stats/scatter-plots.html
+% trying to use https://www.mathworks.com/help/stats/gscatter.html
 % maybe
 % then fit some model (linear/m=x/etc)?
-
+X = cell2mat(data(2:end,1:1));
+Y = cell2mat(data(2:end,3:3));
+P = cell2mat(data(2:end,2:2));
+R = cell2mat(data(2:end,4:4));
+gscatter(X, Y, P, 'rgb')
+xlabel('trials');
+ylabel('p');
 
 % 2nd plot?
 % curves of port probabilities with rat choice points?
