@@ -80,3 +80,13 @@ else
 end
 end
 
+%% Plot Data
+% Plot skele?
+% x-axis: trial
+% y-axis: probability of reward
+% color of point: port (R=1,B=2,G=3)
+% shape of point: reward given (x=0,o=1)
+% then fit some model (linear/m=x/etc)?
+
+% 2nd plot?
+% curves of port probabilities with rat choice points?
