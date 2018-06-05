@@ -1,4 +1,4 @@
-function wins = simData(rat_bias, noise)
+function win_counter = simData(rat_bias, noise)
 %% Initialize variables
 
 % Choose starting reward probabilites fore each state
@@ -12,18 +12,16 @@ start_state = 1;
 
 % Choose value to decrement by if reward is given
 decValue = .05;
-% decValue = 0.95;
+%decValue = 0.95;
 
 % choose number of trials
 ntrials = 100;
 
 % add noise
-% noise = .001;
-% rat_bias = .007;
-losses = 0;
-wins = 0;
-early_switch = 0;
-
+noise = .02;
+rat_bias = .02;
+loss_counter = 0;
+win_counter = 0;
 %% Simulate Data
 % Make a vector of the probabilites.
 probs = [port1start, port2start, port3start];
@@ -57,12 +55,12 @@ dataCell{i+1,4} = current_reward;
 % update probabilites
 if current_reward == 1
     probs(current_state) = probs(current_state)-decValue;
-%     probs(current_state) = probs(current_state)*decValue;
-    losses = 0;
-    wins = wins+1;
+    %probs(current_state) = probs(current_state)*decValue;
+    loss_counter = 0;
+    win_counter = win_counter+1;
 else
-    losses = losses+1;
-    wins = 0;
+    loss_counter = loss_counter+1;
+    win_counter = 0;
     %continue
 end
 
@@ -79,9 +77,9 @@ end
 % separating them into variables for debug purposes, will clean up later
 high_val = M(1);
 two_val = M(2);
-loss = (rat_bias + noise) * losses;
-win = (rat_bias + noise) * wins;
-if high_val - loss + win < two_val
+l = ((rat_bias + noise) * loss_counter);
+w = ((rat_bias + noise) * win_counter);
+if high_val - l + w < two_val
     current_state = I(2);
 else
     current_state = I(1);
@@ -91,6 +89,13 @@ end
 % convert data to matrix form
 dataMat = cell2mat(dataCell(2:end,:));
 
-
+ X = cell2mat(dataCell(2:end,1:1));	
+ Y = cell2mat(dataCell(2:end,3:3));	
+ P = cell2mat(dataCell(2:end,2:2));	
+ R = cell2mat(dataCell(2:end,4:4));	
+ gscatter(X, Y, P, 'rgb')	
+ xlabel('trials');	
+ ylabel('p');
+ 
 % plot data
-% visFunct(dataMat)
+visFunct(dataMat)
