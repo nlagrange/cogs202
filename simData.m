@@ -96,9 +96,9 @@ two_val = M(2);
 % choose highest port value as current state
 % l = ((rat_bias + noise) * loss_counter);
 % w = ((rat_bias + noise) * win_counter);
-score_1 = ((rat_bias + noise) * win_counter(1)) - ((rat_bias + noise) * loss_counter(1));
-score_2 = ((rat_bias + noise) * win_counter(2)) - ((rat_bias + noise) * loss_counter(2));
-score_3 = ((rat_bias + noise) * win_counter(3)) - ((rat_bias + noise) * loss_counter(3));
+score_1 = ((rat_bias - noise) * win_counter(1)) - ((rat_bias + noise) * loss_counter(1));
+score_2 = ((rat_bias - noise) * win_counter(2)) - ((rat_bias + noise) * loss_counter(2));
+score_3 = ((rat_bias - noise) * win_counter(3)) - ((rat_bias + noise) * loss_counter(3));
 if current_reward == 1
     continue
 else
