@@ -19,10 +19,10 @@ decValue = .05;
 ntrials = 100;
 
 % add noise
-noise = .002;
-rat_bias1 = .007;
-rat_bias2 = .001;
-rat_bias3 = .009;
+% noise = .002;
+% rat_bias1 = .007;
+% rat_bias2 = .001;
+% rat_bias3 = .009;
 
 %more initializing
 loss_counter = [0 0 0];
@@ -147,7 +147,7 @@ end
 overall_wins;
 
 %% Plot Data
-
+% Make sure to comment out this section before running iterateBias.m
 % convert data to matrix form
 % dataMat = cell2mat(dataCell(2:end,:));
 % % 

@@ -4,11 +4,11 @@ wins = [];
 num_iterations = 50;
 noise = .001;
 tic
-rat_bias_values = [0:5:100];
+rat_bias_values = [0:.005:1];
 for j=1:length(rat_bias_values)
     rat_bias = rat_bias_values(j);
     for k=1:num_iterations
-        wins(j,k) = simData(rat_bias, 0.001, 0.007, noise);
+        wins(j,k) = simData(rat_bias, 0.001, 0.001, noise);
         [j,k]
         toc
     end
