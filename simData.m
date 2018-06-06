@@ -32,6 +32,11 @@ dataCell = {'trial', 'port', 'prob', 'reward'};
 % Enter that state (port location).
 current_state = start_state;
 
+%initialize
+p1probs = [];
+p2probs = [];
+p3probs = [];
+
 for i = 1:ntrials
 
 % find probability of current state
@@ -52,6 +57,14 @@ dataCell{i+1,2} = current_state;
 dataCell{i+1,3} = current_prob;
 dataCell{i+1,4} = current_reward;
 
+% for each trial, record probabilites of each port seperately.
+p1probs(i,:) = [probs(1)];
+p2probs(i,:) = [probs(2)];
+p3probs(i,:) = [probs(3)];
+
+
+
+  
 % update probabilites
 if current_reward == 1
     probs(current_state) = probs(current_state)-decValue;
@@ -77,13 +90,6 @@ end
 % separating them into variables for debug purposes, will clean up later
 high_val = M(1);
 two_val = M(2);
-% TODO NEW CALCS:
-% take in 3 rat_bias: rat_bias1,2,3 for each port
-% keep loss/win counters for each port, loss_counter1, win_counter1, etc
-% calculate l and w for each port: 
-% ex. l2 = ((rat_bias2 + noise) * loss_counter2
-% then on loss, get highest port value (port2 = w2 - l2 vs. port1, port3)
-% choose highest port value as current state
 l = ((rat_bias + noise) * loss_counter);
 w = ((rat_bias + noise) * win_counter);
 if high_val - l + w < two_val
@@ -105,4 +111,11 @@ dataMat = cell2mat(dataCell(2:end,:));
  ylabel('p');
  
 % plot data
-visFunct(dataMat)
+ visFunct(dataMat)
+ 
+ figure
+ plot(p1probs, 'o-')
+ hold on
+ plot(p2probs, 'o-')
+ hold on
+ plot(p3probs, 'o-')

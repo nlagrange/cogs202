@@ -22,11 +22,11 @@ end
 
 
 figure
-plot(state1(:,1),state1(:,3), '.-')
+plot(state1(:,1),state1(:,3), 'o-')
 hold on
-plot(state2(:,1),state2(:,3), '.-')
+plot(state2(:,1),state2(:,3), 'o-')
 hold on
-plot(state3(:,1),state3(:,3), '.-')
+plot(state3(:,1),state3(:,3), 'o-')
 
 legend('Port 1','Port 2','Port 3')
 xlabel('Trial')
