@@ -77,6 +77,13 @@ end
 % separating them into variables for debug purposes, will clean up later
 high_val = M(1);
 two_val = M(2);
+% TODO NEW CALCS:
+% take in 3 rat_bias: rat_bias1,2,3 for each port
+% keep loss/win counters for each port, loss_counter1, win_counter1, etc
+% calculate l and w for each port: 
+% ex. l2 = ((rat_bias2 + noise) * loss_counter2
+% then on loss, get highest port value (port2 = w2 - l2 vs. port1, port3)
+% choose highest port value as current state
 l = ((rat_bias + noise) * loss_counter);
 w = ((rat_bias + noise) * win_counter);
 if high_val - l + w < two_val
