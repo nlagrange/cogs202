@@ -1,4 +1,4 @@
-function win_counter = simData(rat_bias1, rat_bias2, rat_bias3, noise)
+function win_counter = simData(rat_bias, noise)
 %% Initialize variables
 
 % Choose starting reward probabilites fore each state
@@ -18,13 +18,10 @@ decValue = .05;
 ntrials = 100;
 
 % add noise
-noise = .002;
-rat_bias1 = .007;
-rat_bias2 = .001;
-rat_bias3 = .009;
-loss_counter = [0 0 0];
-win_counter = [0 0 0];
-
+noise = .02;
+rat_bias = .02;
+loss_counter = 0;
+win_counter = 0;
 %% Simulate Data
 % Make a vector of the probabilites.
 probs = [port1start, port2start, port3start];
@@ -64,14 +61,19 @@ dataCell{i+1,4} = current_reward;
 p1probs(i,:) = [probs(1)];
 p2probs(i,:) = [probs(2)];
 p3probs(i,:) = [probs(3)];
+
+
+
   
 % update probabilites
 if current_reward == 1
     probs(current_state) = probs(current_state)-decValue;
     %probs(current_state) = probs(current_state)*decValue;
-    win_counter(current_state) = win_counter(current_state) + 1;
+    loss_counter = 0;
+    win_counter = win_counter+1;
 else
-    loss_counter(current_state) = loss_counter(current_state) + 1;
+    loss_counter = loss_counter+1;
+    win_counter = 0;
     %continue
 end
 
@@ -88,38 +90,13 @@ end
 % separating them into variables for debug purposes, will clean up later
 high_val = M(1);
 two_val = M(2);
-
-% TODO NEW CALCS:
-% take in 3 rat_bias: rat_bias1,2,3 for each port
-% keep loss/win counters for each port, loss_counter1, win_counter1, etc
-% calculate l and w for each port: 
-% ex. l2 = ((rat_bias2 + noise) * loss_counter2
-% then on loss, get highest port value (port2 = w2 - l2 vs. port1, port3)
-% choose highest port value as current state
-% l = ((rat_bias + noise) * loss_counter);
-% w = ((rat_bias + noise) * win_counter);
-score_1 = ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
-score_2 = ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
-score_3 = ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
-if current_reward == 1
-    continue
+l = ((rat_bias + noise) * loss_counter);
+w = ((rat_bias + noise) * win_counter);
+if high_val - l + w < two_val
+    current_state = I(2);
 else
-    % loss, switch based on calc
-    % TODO do we care about what the current state is? or just the port
-    % calc? also this logic favors state 1 and 2 over 3
-    if score_1 >= score_2 && score_1 >= score_3
-        current_state = 1;
-    elseif score_2 >= score_1 && score_2 >= score_3
-        current_state = 2;
-    else
-        current_state = 3;
-    end
+    current_state = I(1);
 end
-% if high_val - l + w < two_val
-%     current_state = I(2);
-% else
-%     current_state = I(1);
-% end
 end
 
 % convert data to matrix form
@@ -134,7 +111,7 @@ dataMat = cell2mat(dataCell(2:end,:));
  ylabel('p');
  
 % plot data
- visFunct(dataMat)
+visFunct(dataMat)
  
  figure
  plot(p1probs, 'o-')
@@ -142,3 +119,7 @@ dataMat = cell2mat(dataCell(2:end,:));
  plot(p2probs, 'o-')
  hold on
  plot(p3probs, 'o-')
+ legend('Port 1','Port 2','Port 3')
+xlabel('Trial')
+ylabel('Probability of Reward')
+title('Change in the reward probability of each port per trial')
