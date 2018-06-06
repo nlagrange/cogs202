@@ -1,8 +1,9 @@
-function win_counter = simData(rat_bias, noise)
+
+function win_counter = simData(rat_bias1, rat_bias2, rat_bias3, noise)
+
 %% Initialize variables
 
 % Choose starting reward probabilites fore each state
-
 port1start = .9;
 port2start = .5;
 port3start = .2;
@@ -18,11 +19,19 @@ decValue = .05;
 ntrials = 100;
 
 % add noise
-noise = .02;
-rat_bias = .02;
-loss_counter = 0;
-win_counter = 0;
-%% Simulate Data
+noise = .002;
+rat_bias1 = .007;
+rat_bias2 = .001;
+rat_bias3 = .009;
+
+%more initializing
+loss_counter = [0 0 0];
+win_counter = [0 0 0];
+
+p1probs = zeros(length(ntrials),1);
+p2probs = zeros(length(ntrials),1);
+p3probs = zeros(length(ntrials),1);
+
 % Make a vector of the probabilites.
 probs = [port1start, port2start, port3start];
 
@@ -32,10 +41,7 @@ dataCell = {'trial', 'port', 'prob', 'reward'};
 % Enter that state (port location).
 current_state = start_state;
 
-%initialize
-p1probs = [];
-p2probs = [];
-p3probs = [];
+%% start simulation
 
 for i = 1:ntrials
 
@@ -58,46 +64,77 @@ dataCell{i+1,3} = current_prob;
 dataCell{i+1,4} = current_reward;
 
 % for each trial, record probabilites of each port seperately.
-p1probs(i,:) = [probs(1)];
-p2probs(i,:) = [probs(2)];
-p3probs(i,:) = [probs(3)];
-
-
-
+p1probs(i,:) = probs(1);
+p2probs(i,:) = probs(2);
+p3probs(i,:) = probs(3);
   
 % update probabilites
 if current_reward == 1
     probs(current_state) = probs(current_state)-decValue;
     %probs(current_state) = probs(current_state)*decValue;
-    loss_counter = 0;
-    win_counter = win_counter+1;
+    win_counter(current_state) = win_counter(current_state) + 1;
 else
-    loss_counter = loss_counter+1;
-    win_counter = 0;
+    loss_counter(current_state) = loss_counter(current_state) + 1;
     %continue
 end
 
+%% base decision on probabilites (optimal model?)
+
+% PURE HIGHEST PROB DECISION HEURISTIC
 % check which state has highest probabilities
 % [~, I] = max(probs);
 % move to state with highest probability
 % current_state = I;
 
-% check which state has highest probabilities
-% get the top two, in case rat wants to switch (noise/bias)
-[M,I] = maxk(probs,3);
+% HIGHEST PROB DECISION HEURISTIC WITH NOISE
+% % check which state has highest probabilities
+% % get the top two, in case rat wants to switch (noise/bias)
+% [M,I] = maxk(probs,3);
+% 
+% % move to state with highest probability WITH NOISE AND BIAS
+% % separating them into variables for debug purposes, will clean up later
+% high_val = M(1);
+% two_val = M(2);
+% 
+% if high_val - l + w < two_val
+%     current_state = I(2);
+% else
+%     current_state = I(1);
+% end
 
-% move to state with highest probability WITH NOISE AND BIAS
-% separating them into variables for debug purposes, will clean up later
-high_val = M(1);
-two_val = M(2);
-l = ((rat_bias + noise) * loss_counter);
-w = ((rat_bias + noise) * win_counter);
-if high_val - l + w < two_val
-    current_state = I(2);
+
+%% Win stay, lose shift (more likely to mimic actual rat behavior)
+
+% TODO NEW CALCS:
+% take in 3 rat_bias: rat_bias1,2,3 for each port
+% keep loss/win counters for each port, loss_counter1, win_counter1, etc
+% calculate l and w for each port: 
+% ex. l2 = ((rat_bias2 + noise) * loss_counter2
+% then on loss, get highest port value (port2 = w2 - l2 vs. port1, port3)
+% choose highest port value as current state
+% l = ((rat_bias + noise) * loss_counter);
+% w = ((rat_bias + noise) * win_counter);
+score_1 = ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
+score_2 = ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
+score_3 = ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
+if current_reward == 1
+    continue
 else
-    current_state = I(1);
+    % loss, switch based on calc
+    % TODO do we care about what the current state is? or just the port
+    % calc?
+    if score_1 >= score_2 && score_1 >= score_3
+        current_state = 1;
+    elseif score_2 >= score_1 && score_2 >= score_3
+        current_state = 2;
+    else
+        current_state = 3;
+    end
 end
+
 end
+
+%% Plot Data
 
 % convert data to matrix form
 dataMat = cell2mat(dataCell(2:end,:));
@@ -111,7 +148,7 @@ dataMat = cell2mat(dataCell(2:end,:));
  ylabel('p');
  
 % plot data
-visFunct(dataMat)
+ visFunct(dataMat)
  
  figure
  plot(p1probs, 'o-')
