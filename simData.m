@@ -4,12 +4,12 @@ function overall_wins = simData(rat_bias1, rat_bias2, rat_bias3, noise)
 %% Initialize variables
 
 % Choose starting reward probabilites fore each state
-port1start = .9;
-port2start = .5;
-port3start = .2;
+prob1start = .9;
+prob2start = .5;
+prob3start = .2;
 
-% Choose a state (port location) to start in.
-start_state = 1;
+% Choose a port location to start in.
+start_port = 1;
 
 % Choose value to decrement by if reward is given
 decValue = .05;
@@ -28,26 +28,32 @@ rat_bias3 = .009;
 loss_counter = [0 0 0];
 win_counter = [0 0 0];
 overall_wins = 0;
+port_count = [0 0 0];
 
 p1probs = zeros(length(ntrials),1);
 p2probs = zeros(length(ntrials),1);
 p3probs = zeros(length(ntrials),1);
 
+
+
 % Make a vector of the probabilites.
-probs = [port1start, port2start, port3start];
+probs = [prob1start, prob2start, prob3start];
 
 % create cell array to store data
 dataCell = {'trial', 'port', 'prob', 'reward'};
 
-% Enter that state (port location).
-current_state = start_state;
+% Enter that port location.
+current_port = start_port;
 
 %% start simulation
 
 for i = 1:ntrials
 
+% record number of times port was chosen
+port_count(current_port) = port_count(current_port) + 1;
+
 % find probability of current state
-current_prob = probs(current_state);
+current_prob = probs(current_port);
 % produce a reward or non-reward
 current_reward = rewardGen(current_prob);
 % current_reward = binornd(1,current_prob); % Equivalent
@@ -60,7 +66,7 @@ current_reward = rewardGen(current_prob);
 
 % instert values into cell array
 dataCell{i+1,1} = i; 
-dataCell{i+1,2} = current_state; 
+dataCell{i+1,2} = current_port; 
 dataCell{i+1,3} = current_prob;
 dataCell{i+1,4} = current_reward;
 
@@ -71,14 +77,16 @@ p3probs(i,:) = probs(3);
   
 % update probabilites
 if current_reward == 1
-    probs(current_state) = probs(current_state)-decValue;
+    probs(current_port) = probs(current_port)-decValue;
     %probs(current_state) = probs(current_state)*decValue;
-    win_counter(current_state) = win_counter(current_state) + 1;
+    win_counter(current_port) = win_counter(current_port) + 1;
     overall_wins = overall_wins + 1;
 else
-    loss_counter(current_state) = loss_counter(current_state) + 1;
+    loss_counter(current_port) = loss_counter(current_port) + 1;
     %continue
 end
+
+
 
 %% base decision on probabilites (optimal model?)
 
@@ -126,11 +134,11 @@ else
     % TODO do we care about what the current state is? or just the port
     % calc?
     if score_1 >= score_2 && score_1 >= score_3
-        current_state = 1;
+        current_port = 1;
     elseif score_2 >= score_1 && score_2 >= score_3
-        current_state = 2;
+        current_port = 2;
     else
-        current_state = 3;
+        current_port = 3;
     end
 end
 
