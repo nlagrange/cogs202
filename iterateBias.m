@@ -8,7 +8,7 @@ rat_bias_values = [0:5:100];
 for j=1:length(rat_bias_values)
     rat_bias = rat_bias_values(j);
     for k=1:num_iterations
-        wins(j,k) = simData(rat_bias, 0.001, 0.009, noise);
+        wins(j,k) = simData(rat_bias, 0.001, 0.007, noise);
         [j,k]
         toc
     end

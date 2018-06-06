@@ -1,5 +1,5 @@
 
-function win_counter = simData(rat_bias1, rat_bias2, rat_bias3, noise)
+function overall_wins = simData(rat_bias1, rat_bias2, rat_bias3, noise)
 
 %% Initialize variables
 
@@ -27,6 +27,7 @@ rat_bias3 = .009;
 %more initializing
 loss_counter = [0 0 0];
 win_counter = [0 0 0];
+overall_wins = 0;
 
 p1probs = zeros(length(ntrials),1);
 p2probs = zeros(length(ntrials),1);
@@ -73,6 +74,7 @@ if current_reward == 1
     probs(current_state) = probs(current_state)-decValue;
     %probs(current_state) = probs(current_state)*decValue;
     win_counter(current_state) = win_counter(current_state) + 1;
+    overall_wins = overall_wins + 1;
 else
     loss_counter(current_state) = loss_counter(current_state) + 1;
     %continue
@@ -134,29 +136,31 @@ end
 
 end
 
+overall_wins;
+
 %% Plot Data
 
 % convert data to matrix form
-dataMat = cell2mat(dataCell(2:end,:));
-
- X = cell2mat(dataCell(2:end,1:1));	
- Y = cell2mat(dataCell(2:end,3:3));	
- P = cell2mat(dataCell(2:end,2:2));	
- R = cell2mat(dataCell(2:end,4:4));	
- gscatter(X, Y, P, 'rgb')	
- xlabel('trials');	
- ylabel('p');
- 
-% plot data
- visFunct(dataMat)
- 
- figure
- plot(p1probs, 'o-')
- hold on
- plot(p2probs, 'o-')
- hold on
- plot(p3probs, 'o-')
- legend('Port 1','Port 2','Port 3')
-xlabel('Trial')
-ylabel('Probability of Reward')
-title('Change in the reward probability of each port per trial')
+% dataMat = cell2mat(dataCell(2:end,:));
+% % 
+% X = cell2mat(dataCell(2:end,1:1));	
+% Y = cell2mat(dataCell(2:end,3:3));	
+% P = cell2mat(dataCell(2:end,2:2));	
+% R = cell2mat(dataCell(2:end,4:4));	
+% gscatter(X, Y, P, 'rgb')	
+% xlabel('trials');	
+% ylabel('p');
+%  
+% % plot data
+% visFunct(dataMat)
+%  
+% figure
+% plot(p1probs, 'o-')
+% hold on
+% plot(p2probs, 'o-')
+% hold on
+% plot(p3probs, 'o-')
+% legend('Port 1','Port 2','Port 3')
+% xlabel('Trial')
+% ylabel('Probability of Reward')
+% title('Change in the reward probability of each port per trial')
