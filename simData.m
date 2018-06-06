@@ -1,4 +1,4 @@
-function win_counter = simData(rat_bias, noise)
+function win_counter = simData(rat_bias1, rat_bias2, rat_bias3, noise)
 %% Initialize variables
 
 % Choose starting reward probabilites fore each state
@@ -19,7 +19,9 @@ ntrials = 100;
 
 % add noise
 noise = .002;
-rat_bias = .007;
+rat_bias1 = .007;
+rat_bias2 = .001;
+rat_bias3 = .009;
 loss_counter = [0 0 0];
 win_counter = [0 0 0];
 
@@ -96,15 +98,15 @@ two_val = M(2);
 % choose highest port value as current state
 % l = ((rat_bias + noise) * loss_counter);
 % w = ((rat_bias + noise) * win_counter);
-score_1 = ((rat_bias - noise) * win_counter(1)) - ((rat_bias + noise) * loss_counter(1));
-score_2 = ((rat_bias - noise) * win_counter(2)) - ((rat_bias + noise) * loss_counter(2));
-score_3 = ((rat_bias - noise) * win_counter(3)) - ((rat_bias + noise) * loss_counter(3));
+score_1 = ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
+score_2 = ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
+score_3 = ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
 if current_reward == 1
     continue
 else
     % loss, switch based on calc
     % TODO do we care about what the current state is? or just the port
-    % calc?
+    % calc? also this logic favors state 1 and 2 over 3
     if score_1 >= score_2 && score_1 >= score_3
         current_state = 1;
     elseif score_2 >= score_1 && score_2 >= score_3
