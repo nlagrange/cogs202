@@ -6,9 +6,10 @@ noise = .1;
 tic
 rat_bias_values = [0:.05:1];
 for j=1:length(rat_bias_values)
+%     using rat_bias for noise
     rat_bias = rat_bias_values(j);
     for k=1:num_iterations
-        wins(j,k) = simData(rat_bias, 0.001, 0.01, noise);
+        wins(j,k) = simData(0.1, 0.01, 0.001, rat_bias);
         [j,k]
         toc
     end
