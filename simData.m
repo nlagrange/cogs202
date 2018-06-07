@@ -1,4 +1,4 @@
-function overall_wins = simData(rat_bias1, rat_bias2, rat_bias3, noise)
+function [overall_wins, average_wins] = simData(rat_bias1, rat_bias2, rat_bias3, noise)
 
 %% Initialize variables
 
@@ -8,10 +8,10 @@ prob2start = .5;
 prob3start = .2;
 
 % Choose a port location to start in.
-start_port = 1;
+start_port = randi(3);
 
 % Choose value to decrement by if reward is given
-decValue = .05;
+decValue = .001;
 %decValue = 0.95;
 
 % choose number of trials
@@ -75,7 +75,7 @@ p3probs(i,:) = probs(3);
   
 % update probabilites
 if current_reward == 1
-    probs(current_port) = probs(current_port)-decValue;
+    probs(current_port) = probs(current_port)*(1-decValue);
     %probs(current_state) = probs(current_state)*decValue;
     win_counter(current_port) = win_counter(current_port) + 1;
     overall_wins = overall_wins + 1;
@@ -113,57 +113,57 @@ end
 %         current_port = 3;
 %     end
 % end
-% 
+
 
 
 %% greedy (no noise or bias how would I add that?)
 
-% % update emperical average (estimated value). Necessary for greedy.
-% emperical_ave(current_port) = emperical_ave(current_port) + (current_reward - (emperical_ave(current_port)+noise))/port_sampled_count(current_port);
-% 
-% 
-% 
-% score_1 = emperical_ave(1); % ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
-% score_2 = emperical_ave(2); % ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
-% score_3 = emperical_ave(3); % ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
-% 
-% % make decision 
-% if score_1 >= score_2 && score_1 >= score_3
-%         current_port = 1;
-%     elseif score_2 >= score_1 && score_2 >= score_3
-%         current_port = 2;
-% else
-%         current_port = 3;
-%     end
-
-%% Win-stay lose-shift to next best without noise and bias
-
 % update emperical average (estimated value). Necessary for greedy.
-emperical_ave(current_port) = emperical_ave(current_port) + (current_reward - emperical_ave(current_port)+noise)/port_sampled_count(current_port);
+emperical_ave(current_port) = emperical_ave(current_port) + (current_reward - (emperical_ave(current_port)+noise))/port_sampled_count(current_port);
 
-% check 
-port_value_check = win_counter ./ port_sampled_count;
+
 
 score_1 = emperical_ave(1); % ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
 score_2 = emperical_ave(2); % ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
 score_3 = emperical_ave(3); % ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
 
-% make decision
-if current_reward == 1
-    continue
-else
-    % loss, switch based on calc
-    % TODO do we care about what the current state is? or just the port
-    % calc? Yes we care about current state, because the should not return
-    % to that state if no reward was recieved.
-    if score_1 >= score_2 && score_1 >= score_3 && current_port ~= 1
+% make decision 
+if score_1 >= score_2 && score_1 >= score_3
         current_port = 1;
-    elseif score_2 >= score_1 && score_2 >= score_3 && current_port ~= 2
+    elseif score_2 >= score_1 && score_2 >= score_3
         current_port = 2;
-    elseif current_port ~= 3
+else
         current_port = 3;
     end
-end
+
+%% Win-stay lose-shift to next best without noise and bias
+% 
+% % update emperical average (estimated value). Necessary for greedy.
+% emperical_ave(current_port) = emperical_ave(current_port) + (current_reward - emperical_ave(current_port)+noise)/port_sampled_count(current_port);
+% 
+% % check 
+% port_value_check = win_counter ./ port_sampled_count;
+% 
+% score_1 = emperical_ave(1); % ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
+% score_2 = emperical_ave(2); % ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
+% score_3 = emperical_ave(3); % ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
+% 
+% % make decision
+% if current_reward == 1
+%     continue
+% else
+%     % loss, switch based on calc
+%     % TODO do we care about what the current state is? or just the port
+%     % calc? Yes we care about current state, because the should not return
+%     % to that state if no reward was recieved.
+%     if score_1 >= score_2 && score_1 >= score_3 && current_port ~= 1
+%         current_port = 1;
+%     elseif score_2 >= score_1 && score_2 >= score_3 && current_port ~= 2
+%         current_port = 2;
+%     elseif current_port ~= 3
+%         current_port = 3;
+%     end
+% end
 
 %% RANDOM IF LOSS
 % if current_reward == 1
@@ -219,6 +219,7 @@ end
 
 overall_wins;
 
+average_wins = overall_wins/ntrials;
 %% PLOTING CODE
 
 % convert data to matrix form

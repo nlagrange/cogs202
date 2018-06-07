@@ -24,3 +24,8 @@ plot(rat_bias_values, mean_wins, 's-')
 hold on
 errorbar(rat_bias_values, mean_wins, sd_wins, 's-')
 hold off
+xlabel('Bias')
+ylabel('Reward')
+title('Reward as a function of bias')
+
+
