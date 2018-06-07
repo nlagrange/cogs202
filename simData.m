@@ -84,25 +84,71 @@ else
     %continue
 end
 
-
+% %% plot wins
+%     figure
+%     plot(port_sampled_count),sum(win_counter))
+%     hold on
 
 %% Look ad different decision hueristics. Make sure alternative options are commented out. 
 
 
 %% original: win-stay, lose-shift to next highest
-% TODO NEW CALCS:
-% take in 3 rat_bias: rat_bias1,2,3 for each port
-% keep loss/win counters for each port, loss_counter1, win_counter1, etc
-% calculate l and w for each port: 
-% ex. l2 = ((rat_bias2 + noise) * loss_counter2
-% then on loss, get highest port value (port2 = w2 - l2 vs. port1, port3)
-% choose highest port value as current state
-% l = ((rat_bias + noise) * loss_counter);
-% w = ((rat_bias + noise) * win_counter);
-score_1 = ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
-score_2 = ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
-score_3 = ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
 
+% score_1 = ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
+% score_2 = ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
+% score_3 = ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
+% 
+% if current_reward == 1
+%     continue
+% else
+%     % loss, switch based on calc
+%     % TODO do we care about what the current state is? or just the port
+%     % calc? Yes we care about current state, because the should not return
+%     % to that state if no reward was recieved.
+%     if score_1 >= score_2 && score_1 >= score_3 && current_port ~= 1
+%         current_port = 1;
+%     elseif score_2 >= score_1 && score_2 >= score_3 && current_port ~= 2
+%         current_port = 2;
+%     elseif current_port ~= 3
+%         current_port = 3;
+%     end
+% end
+% 
+
+
+%% greedy (no noise or bias how would I add that?)
+
+% % update emperical average (estimated value). Necessary for greedy.
+% emperical_ave(current_port) = emperical_ave(current_port) + (current_reward - (emperical_ave(current_port)+noise))/port_sampled_count(current_port);
+% 
+% 
+% 
+% score_1 = emperical_ave(1); % ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
+% score_2 = emperical_ave(2); % ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
+% score_3 = emperical_ave(3); % ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
+% 
+% % make decision 
+% if score_1 >= score_2 && score_1 >= score_3
+%         current_port = 1;
+%     elseif score_2 >= score_1 && score_2 >= score_3
+%         current_port = 2;
+% else
+%         current_port = 3;
+%     end
+
+%% Win-stay lose-shift to next best without noise and bias
+
+% update emperical average (estimated value). Necessary for greedy.
+emperical_ave(current_port) = emperical_ave(current_port) + (current_reward - emperical_ave(current_port)+noise)/port_sampled_count(current_port);
+
+% check 
+port_value_check = win_counter ./ port_sampled_count;
+
+score_1 = emperical_ave(1); % ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
+score_2 = emperical_ave(2); % ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
+score_3 = emperical_ave(3); % ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
+
+% make decision
 if current_reward == 1
     continue
 else
@@ -120,28 +166,7 @@ else
 end
 
 
-
-%% greedy (no noise or bias how would I add that?)
-
-% update emperical average (estimated value). Necessary for greedy.
-% emperical_ave(current_port) = emperical_ave(current_port) + (current_reward - emperical_ave(current_port))/port_sampled_count(current_port);
-% 
-
-
-% score_1 = emperical_ave(1); % ((rat_bias1 - noise) * win_counter(1)) - ((rat_bias1 + noise) * loss_counter(1));
-% score_2 = emperical_ave(2); % ((rat_bias2 - noise) * win_counter(2)) - ((rat_bias2 + noise) * loss_counter(2));
-% score_3 = emperical_ave(3); % ((rat_bias3 - noise) * win_counter(3)) - ((rat_bias3 + noise) * loss_counter(3));
-% 
-% if score_1 >= score_2 && score_1 >= score_3
-%         current_port = 1;
-%     elseif score_2 >= score_1 && score_2 >= score_3
-%         current_port = 2;
-% else
-%         current_port = 3;
-%     end
-
-
-%% base decision on probabilites (optimal model?)
+%% OLD CODE base decision on probabilites (optimal model?)
 
 % PURE HIGHEST PROB DECISION HEURISTIC
 % check which state has highest probabilities
@@ -165,13 +190,23 @@ end
 %     current_state = I(1);
 % end
 
+% TODO NEW CALCS:
+% take in 3 rat_bias: rat_bias1,2,3 for each port
+% keep loss/win counters for each port, loss_counter1, win_counter1, etc
+% calculate l and w for each port: 
+% ex. l2 = ((rat_bias2 + noise) * loss_counter2
+% then on loss, get highest port value (port2 = w2 - l2 vs. port1, port3)
+% choose highest port value as current state
+% l = ((rat_bias + noise) * loss_counter);
+% w = ((rat_bias + noise) * win_counter);
+
 
 
 end
 
 overall_wins;
 
-%% Plot Data
+%% PLOTING CODE
 
 % convert data to matrix form
 % dataMat = cell2mat(dataCell(2:end,:));
@@ -197,3 +232,16 @@ overall_wins;
 % xlabel('Trial')
 % ylabel('Probability of Reward')
 % title('Change in the reward probability of each port per trial')
+
+% figure
+% plot(p1probs, 'o-')
+% hold on
+% plot(p2probs, 'o-')
+% hold on
+% plot(p3probs, 'o-')
+% legend('Port 1','Port 2','Port 3')
+% xlabel('Trial')
+% ylabel('Probability of Reward')
+% title('Change in the reward probability of each port per trial')
+
+
