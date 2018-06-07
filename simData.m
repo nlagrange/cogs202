@@ -165,6 +165,19 @@ else
     end
 end
 
+%% RANDOM IF LOSS
+% if current_reward == 1
+%     continue
+% else
+%     new_port = current_port;
+%     while new_port == current_port
+%        current_port = randi(3);  
+%     end
+% end
+
+%% RANDOM ALL
+% current_port = randi(3); 
+
 
 %% OLD CODE base decision on probabilites (optimal model?)
 
@@ -232,7 +245,7 @@ overall_wins;
 % xlabel('Trial')
 % ylabel('Probability of Reward')
 % title('Change in the reward probability of each port per trial')
-
+% 
 % figure
 % plot(p1probs, 'o-')
 % hold on
